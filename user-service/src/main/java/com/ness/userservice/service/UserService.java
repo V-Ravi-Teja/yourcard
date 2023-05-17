@@ -1,11 +1,13 @@
 package com.ness.userservice.service;
 
 import com.ness.userservice.dto.UserDTO;
+import com.ness.userservice.exception.UserAlreadyExists;
+import com.ness.userservice.exception.UserNotFound;
 
 public interface UserService {
-    public Integer addUser(UserDTO userDTO);
+    public Integer addUser(UserDTO userDTO) throws UserAlreadyExists;
 
-    UserDTO getUser(Integer userId);
+    UserDTO getUser(Integer userId) throws UserNotFound;
 
     boolean checkIfUserPresent(int userId);
 

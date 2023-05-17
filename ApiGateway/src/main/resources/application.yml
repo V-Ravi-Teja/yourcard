@@ -8,25 +8,15 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: product-service
-          uri: lb://product-service
+        - id: user-service
+          uri: lb://user-service
           predicates:
-            - Path=/product/**
+            - Path=/user/**
 
-        - id: rating-service
-          uri: lb://rating-service
+        - id: transaction-service
+          uri: lb://transaction-service
           predicates:
-            - Path=/ratings/**
-
-        - id: catalog-service
-          uri: lb://catalog-service
-          predicates:
-            - Path=/catalog/**
-
-        - id: item-service
-          uri: lb://mongodb-service
-          predicates:
-            - Path=/item/**
+            - Path=/transaction/**
 
 eureka:
   instance:

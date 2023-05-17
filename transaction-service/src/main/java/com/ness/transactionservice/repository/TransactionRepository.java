@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
 
-    @Query("SELECT t FROM Transaction t WHERE t.user.userId = :userId")
+    @Query("SELECT t FROM Transaction t WHERE t.userId = :userId")
     List<Transaction> findAllByUserId(@Param("userId") int userId);
     void deleteByTransactionId(int transactionId);
 
