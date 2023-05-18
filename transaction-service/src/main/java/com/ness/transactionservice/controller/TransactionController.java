@@ -3,6 +3,7 @@ package com.ness.transactionservice.controller;
 import com.ness.transactionservice.dto.TransactionDTO;
 import com.ness.transactionservice.exception.TransactionNotFound;
 import com.ness.transactionservice.service.TransactionService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,19 +23,27 @@ public class TransactionController {
             Integer transactionId=transactionService.addTransaction(transactionDTO);
             return "transaction created wit id:"+transactionId;
     }
+
     @GetMapping(value = "/GetAllTransaction/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<TransactionDTO> getAllTransaction(@PathVariable Integer userId) throws TransactionNotFound {
-        List<TransactionDTO> transactionDTO=transactionService.getallTransaction(userId);
+    public List<TransactionDTO> getAllTransaction(@PathVariable Integer userId){
+        List<TransactionDTO> transactionDTO=transactionService.getAllTransaction(userId);
+        return transactionDTO;
+    }
+
+    @GetMapping(value = "/GetTransaction/{transactionId}")
+    @ResponseStatus(HttpStatus.OK)
+    public TransactionDTO getTransaction(@PathVariable Integer transactionId) throws TransactionNotFound {
+        TransactionDTO transactionDTO = transactionService.getTransaction(transactionId);
         return transactionDTO;
     }
 
     //get transactions by category
     @GetMapping(value = "/TxByCategory/{userId}/{category}")
     @ResponseStatus(HttpStatus.OK)
-    public List<TransactionDTO> getAllTransaction(@PathVariable Integer userId , @PathVariable String category) throws TransactionNotFound{
+    public List<TransactionDTO> getTransactionByCategory(@PathVariable Integer userId , @PathVariable String category){
         //fetching all transactions of user
-        List<TransactionDTO> transactionDTO = transactionService.getallTransaction(userId);
+        List<TransactionDTO> transactionDTO = transactionService.getAllTransaction(userId);
         //filtering transactions by category
         List<TransactionDTO> transactionByCategoryList = transactionService.getTxByCategory(transactionDTO,category);
         return transactionByCategoryList;
@@ -51,7 +60,7 @@ public class TransactionController {
     @Transactional
     @DeleteMapping(value = "/DeleteTransaction/{TransactionId}")
     @ResponseStatus(HttpStatus.OK)
-    public String delTransaction(@PathVariable Integer TransactionId) throws TransactionNotFound {
+    public String deleteTransaction(@PathVariable Integer TransactionId) throws TransactionNotFound {
             transactionService.deleteTransaction(TransactionId);
             return " Transaction with id" + TransactionId + " deleted successfully";
     }

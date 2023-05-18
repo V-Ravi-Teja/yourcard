@@ -33,14 +33,14 @@ public class UserController {
     //  to add: verify whether user present and authorized
     @PutMapping(value= "UpdateUser/{UserId}")
     @ResponseStatus(HttpStatus.OK)
-    public String updateCustomer(@PathVariable Integer userId, @RequestBody UserDTO userDTO) {
+    public String updateUser(@PathVariable Integer userId, @RequestBody UserDTO userDTO) {
         userService.updateUserDetails(userId,userDTO);
         return "user with id: " + userId + " details updated.";
     }
 
     @DeleteMapping(value = "DeleteUser/{Userid}")
     @ResponseStatus(HttpStatus.OK)
-    public String deleteCustomer(@PathVariable Integer Userid){
+    public String deleteUser(@PathVariable Integer Userid){
         userService.deleteUser(Userid);
         return "User with id: " + Userid + " deleted successfully";
     }

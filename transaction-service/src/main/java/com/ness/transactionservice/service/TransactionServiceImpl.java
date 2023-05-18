@@ -4,6 +4,7 @@ import com.ness.transactionservice.dto.TransactionDTO;
 import com.ness.transactionservice.exception.TransactionNotFound;
 import com.ness.transactionservice.model.Transaction;
 import com.ness.transactionservice.repository.TransactionRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,37 +14,32 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class TransactionServiceImpl implements TransactionService{
     @Autowired
     public TransactionRepository transactionRepository;
 
     @Override
     public Integer addTransaction(TransactionDTO transactionDto){
-
         Transaction transaction=new Transaction();
         transactionRepository.save(mapToModel(transaction,transactionDto));
+        log.info("transaction with id: {} added.",transactionDto.getTransactionId());
         return transaction.getTransactionId();
     }
 
     @Override
-    public List<TransactionDTO> getallTransaction(Integer userid){
-        List<Transaction> transactions=transactionRepository.findAllByUserId(userid);
+    public List<TransactionDTO> getAllTransaction(Integer userId){
+        List<Transaction> transactions=transactionRepository.findAllByUserId(userId);
         List<TransactionDTO> transactionDTOs = transactions.stream().map(this::mapToDTOForList).toList();
+        log.info("All transactions of userId: {} fetched.",userId);
         return transactionDTOs;
     }
 
     @Override
-    public void updateTransactionDetails(Integer TransactionId, TransactionDTO transactionDTO) throws TransactionNotFound {
-        Optional<Transaction> optional = transactionRepository.findById(TransactionId);
+    public TransactionDTO getTransaction(Integer transactionId) throws TransactionNotFound{
+        Optional<Transaction> optional = transactionRepository.findById(transactionId);
         Transaction transaction =optional.orElseThrow(() -> new TransactionNotFound("Service.TRANSACTION_NOT_FOUND"));
-        transactionRepository.save(mapToModel(transaction,transactionDTO));
-    }
-
-    @Override
-    public  void deleteTransaction(Integer TransactionId) throws TransactionNotFound{
-        Optional<Transaction> optional = transactionRepository.findById(TransactionId);
-        Transaction transaction = optional.orElseThrow(() -> new TransactionNotFound("Service.TRANSACTION_NOT_FOUND"));
-        transactionRepository.delete(transaction);
+        return mapToDTO(transaction,new TransactionDTO());
     }
 
     @Override
@@ -51,7 +47,24 @@ public class TransactionServiceImpl implements TransactionService{
         List<TransactionDTO> txByCategory = T.stream().
                 filter(s -> category.equals(s.getCategory())).
                 collect(Collectors.toList());
+        log.info("transaction with category: {} fetched.",category);
         return txByCategory;
+    }
+
+    @Override
+    public void updateTransactionDetails(Integer TransactionId, TransactionDTO transactionDTO) throws TransactionNotFound {
+        Optional<Transaction> optional = transactionRepository.findById(TransactionId);
+        Transaction transaction =optional.orElseThrow(() -> new TransactionNotFound("Service.TRANSACTION_NOT_FOUND"));
+        transactionRepository.save(mapToModel(transaction,transactionDTO));
+        log.info("transaction with id: {} updated.",TransactionId);
+    }
+
+    @Override
+    public  void deleteTransaction(Integer TransactionId) throws TransactionNotFound{
+        Optional<Transaction> optional = transactionRepository.findById(TransactionId);
+        Transaction transaction = optional.orElseThrow(() -> new TransactionNotFound("Service.TRANSACTION_NOT_FOUND"));
+        transactionRepository.delete(transaction);
+        log.info("transaction with id: {} deleted.",TransactionId);
     }
 
     private Transaction mapToModel(Transaction transaction, TransactionDTO transactionDto){

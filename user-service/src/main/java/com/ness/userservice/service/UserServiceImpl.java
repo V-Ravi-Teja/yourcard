@@ -5,12 +5,14 @@ import com.ness.userservice.exception.UserAlreadyExists;
 import com.ness.userservice.exception.UserNotFound;
 import com.ness.userservice.model.User;
 import com.ness.userservice.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService{
     @Autowired
     private UserRepository userRepository;
@@ -24,6 +26,7 @@ public class UserServiceImpl implements UserService{
         }
         User user = new User();
         userRepository.save(mapToModel(user,userDTO));
+        log.info("User with id: {} added.",user.getUserId());
         return user.getUserId();
     }
 
@@ -32,13 +35,8 @@ public class UserServiceImpl implements UserService{
         Optional<User> optional = userRepository.findById(userId);
         User user = optional.orElseThrow(() -> new UserNotFound("Service.INVALID_USERID"));
         UserDTO userDTO = new UserDTO();
+        log.info("user with id: {} fetched successfully.",userId);
         return mapToDTO(user,userDTO);
-    }
-
-    @Override
-    public boolean checkIfUserPresent(int userId) {
-        Optional<User> optional = userRepository.findById(userId);
-        return optional.isPresent();
     }
 
     @Override
@@ -46,13 +44,15 @@ public class UserServiceImpl implements UserService{
         Optional<User> optional = userRepository.findById(userId);
         User user = optional.get();
         userRepository.save(mapToModel(user,userDTO));
+        log.info("user with id: {} updated.",userId);
     }
 
     @Override
-    public void deleteUser(Integer userid) {
-        Optional<User> optional = userRepository.findById(userid);
+    public void deleteUser(Integer userId) {
+        Optional<User> optional = userRepository.findById(userId);
         User user = optional.get();
         userRepository.delete(user);
+        log.info("user with id: {} deleted.",userId);
     }
     private User mapToModel(User user, UserDTO userDTO){
         user.setUserId(userDTO.getUserId());

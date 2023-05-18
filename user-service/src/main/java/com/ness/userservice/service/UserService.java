@@ -9,8 +9,6 @@ public interface UserService {
 
     UserDTO getUser(Integer userId) throws UserNotFound;
 
-    boolean checkIfUserPresent(int userId);
-
     void updateUserDetails(Integer userId, UserDTO userDTO);
 
     void deleteUser(Integer userid);
