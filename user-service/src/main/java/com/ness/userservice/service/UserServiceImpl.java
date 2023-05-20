@@ -58,12 +58,16 @@ public class UserServiceImpl implements UserService{
         user.setUserId(userDTO.getUserId());
         user.setUserName(userDTO.getUserName());
         user.setUserPassword(userDTO.getUserPassword());
+        user.setUserLimit(userDTO.getUserLimit());
         return user;
     }
     private UserDTO mapToDTO(User user, UserDTO userDTO){
         userDTO.setUserId(user.getUserId());
         userDTO.setUserName(user.getUserName());
         userDTO.setUserPassword(user.getUserPassword());
+        userDTO.setUserLimit(user.getUserLimit());
         return userDTO;
     }
+
+
 }

@@ -1,16 +1,23 @@
 package com.ness.transactionservice.service;
 
 import com.ness.transactionservice.dto.TransactionDTO;
+import com.ness.transactionservice.dto.UserDTO;
 import com.ness.transactionservice.exception.TransactionNotFound;
 import com.ness.transactionservice.model.Transaction;
 import com.ness.transactionservice.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,6 +25,13 @@ import java.util.stream.Collectors;
 public class TransactionServiceImpl implements TransactionService{
     @Autowired
     public TransactionRepository transactionRepository;
+    @Autowired
+    RestTemplate restTemplate;
+    private final String userServiceUrl = "http://user-service/user/GetUser/";
+
+
+    // log messages using log(Level level, String msg)
+
 
     @Override
     public Integer addTransaction(TransactionDTO transactionDto){
@@ -94,5 +108,50 @@ public class TransactionServiceImpl implements TransactionService{
                 transaction.getDate(),
                 transaction.getCategory());
         return transactionDTO;
+    }
+
+
+
+
+    public Integer getCardBalanceLeft(int userId) {
+
+            UserDTO userDTO=restTemplate.getForObject(userServiceUrl + "/" + userId, UserDTO.class);
+            if (userDTO!=null) {
+
+
+            // Calculate total transaction amount
+            Integer totalTransactionAmount=getTotalTransactionAmountByUser(userId);
+
+            // Calculate card balance left
+            Integer cardBalanceLeft = userDTO.getUserLimit() - totalTransactionAmount;
+
+            return cardBalanceLeft;
+            } else {
+
+            return 0;
+            // Handle error response from User microservice
+            // Return appropriate value or throw an exception
+        }
+    }
+    public Integer getTotalTransactionAmountByUser(int userId) {
+        List<Transaction> transactions = transactionRepository.findAllByUserId(userId);
+        Integer totalAmount = 0;
+        for (Transaction transaction : transactions) {
+            totalAmount += transaction.getAmount().intValue();
+        }
+
+
+        return totalAmount;
+    }
+
+    public boolean doesUserExist(int userId) {
+
+          UserDTO userDTO=restTemplate.getForObject(userServiceUrl + "/" + userId, UserDTO.class);
+
+          if(userDTO.getUserId()==userId)
+              return true;
+
+           else return false;
+
     }
 }

@@ -14,4 +14,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     List<Transaction> findAllByUserId(@Param("userId") int userId);
 
     Transaction getById(Integer transactionId);
+    @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.userId = :userId")
+    Integer getTotalTransactionAmountByUser(@Param("userId") int userId);
+
+
+
 }

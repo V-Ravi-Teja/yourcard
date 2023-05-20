@@ -23,4 +23,6 @@ public class User {
 
     @Column(name = "UserPassword")
     private String userPassword;
+    @Column(name = "UserLimit")
+    private int userLimit;
 }

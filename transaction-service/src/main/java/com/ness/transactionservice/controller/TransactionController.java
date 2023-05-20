@@ -1,6 +1,6 @@
 package com.ness.transactionservice.controller;
 
-import com.ness.transactionservice.dto.TransactionDTO;
+import com.ness.transactionservice.dto.*;
 import com.ness.transactionservice.exception.TransactionNotFound;
 import com.ness.transactionservice.service.TransactionService;
 import lombok.extern.slf4j.Slf4j;
@@ -8,27 +8,46 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
 @RestController
 @RequestMapping(value="/transaction")
+
 public class TransactionController {
+
     @Autowired
     TransactionService transactionService;
+
+    @Autowired
+    RestTemplate restTemplate;
 
     @PostMapping(value="/createTransaction")
     @ResponseStatus(HttpStatus.CREATED)
     public String addTransaction(@RequestBody TransactionDTO transactionDTO){
-            Integer transactionId=transactionService.addTransaction(transactionDTO);
-            return "transaction created wit id:"+transactionId;
+      //  User userRating = restTemplate.getForObject("http://rating-service/ratings/users/"+userId, UserRating.class);
+    if(transactionService.doesUserExist(transactionDTO.getUserId())){
+        Integer transactionId=transactionService.addTransaction(transactionDTO);
+        return "transaction created with id:"+transactionId;
+    }
+    else{
+        return  "no user with user id: "+transactionDTO.getUserId();
+    }
+
     }
 
     @GetMapping(value = "/GetAllTransaction/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public List<TransactionDTO> getAllTransaction(@PathVariable Integer userId){
-        List<TransactionDTO> transactionDTO=transactionService.getAllTransaction(userId);
-        return transactionDTO;
+        if(transactionService.doesUserExist(userId)){
+            List<TransactionDTO> transactionDTO = transactionService.getAllTransaction(userId);
+
+            return transactionDTO;
+        }
+        else{
+            return null;
+        }
     }
 
     @GetMapping(value = "/GetTransaction/{transactionId}")
@@ -64,4 +83,15 @@ public class TransactionController {
             transactionService.deleteTransaction(TransactionId);
             return " Transaction with id" + TransactionId + " deleted successfully";
     }
+    @GetMapping("/cardbalanceleft/{userId}")
+    public String getCardBalanceLeft(@PathVariable int userId) {
+        if(transactionService.doesUserExist(userId)) {
+            Integer cardBalanceLeft = transactionService.getCardBalanceLeft(userId);
+            return "left balance= " + cardBalanceLeft;
+        }
+        else{
+            return "no user with id: "+userId;
+        }
+    }
+
 }

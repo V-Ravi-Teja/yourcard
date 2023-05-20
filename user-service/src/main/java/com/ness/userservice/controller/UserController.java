@@ -22,6 +22,9 @@ public class UserController {
         return "User with id: " + userId + " added successfully.";
     }
 
+
+
+
     //  to add: check authorization and need to only show username and limit
     @GetMapping(value = "/GetUser/{userId}")
     @ResponseStatus(HttpStatus.FOUND)

@@ -17,4 +17,8 @@ public interface TransactionService {
     public void updateTransactionDetails(Integer TransactionId, TransactionDTO transactionDTO) throws TransactionNotFound;
 
     public void deleteTransaction(Integer TransactionId) throws TransactionNotFound;
+    public Integer  getCardBalanceLeft(int userId);
+
+
+    public boolean doesUserExist(int userId);
 }
