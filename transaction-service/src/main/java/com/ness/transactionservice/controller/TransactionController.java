@@ -26,7 +26,6 @@ public class TransactionController {
     @PostMapping(value="/createTransaction")
     @ResponseStatus(HttpStatus.CREATED)
     public String addTransaction(@RequestBody TransactionDTO transactionDTO){
-      //  User userRating = restTemplate.getForObject("http://rating-service/ratings/users/"+userId, UserRating.class);
     if(transactionService.doesUserExist(transactionDTO.getUserId())){
         Integer transactionId=transactionService.addTransaction(transactionDTO);
         return "transaction created with id:"+transactionId;
@@ -49,7 +48,40 @@ public class TransactionController {
             return null;
         }
     }
+    @GetMapping(value = "/GetAllTxdaywise/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<List<TransactionDTO>> getTransactionsByDayForUser(@PathVariable Integer userId){
+        if(transactionService.doesUserExist(userId)){
+            List<List<TransactionDTO>> transactionDTO = transactionService.getTransactionsByDayForUser(userId);
+            return transactionDTO;
+        }
+        else{
+            return null;
+        }
+    }
 
+    @GetMapping(value = "/GetAllTxmonthwise/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<List<TransactionDTO>> getTransactionsByMonthForUser(@PathVariable Integer userId){
+        if(transactionService.doesUserExist(userId)){
+            List<List<TransactionDTO>> transactionDTO = transactionService.getTransactionsByMonthForUser(userId);
+            return transactionDTO;
+        }
+        else{
+            return null;
+        }
+    }
+    @GetMapping(value = "/GetAllTxyearwise/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<List<TransactionDTO>> getTransactionsByYearForUser(@PathVariable Integer userId){
+        if(transactionService.doesUserExist(userId)){
+            List<List<TransactionDTO>> transactionDTO = transactionService.getTransactionsByYearForUser(userId);
+            return transactionDTO;
+        }
+        else{
+            return null;
+        }
+    }
     @GetMapping(value = "/GetTransaction/{transactionId}")
     @ResponseStatus(HttpStatus.OK)
     public TransactionDTO getTransaction(@PathVariable Integer transactionId) throws TransactionNotFound {
@@ -62,11 +94,18 @@ public class TransactionController {
     @ResponseStatus(HttpStatus.OK)
     public List<TransactionDTO> getTransactionByCategory(@PathVariable Integer userId , @PathVariable String category){
         //fetching all transactions of user
-        List<TransactionDTO> transactionDTO = transactionService.getAllTransaction(userId);
-        //filtering transactions by category
-        List<TransactionDTO> transactionByCategoryList = transactionService.getTxByCategory(transactionDTO,category);
-        return transactionByCategoryList;
+        if(transactionService.doesUserExist(userId)) {
+
+            List<TransactionDTO> transactionDTO = transactionService.getAllTransaction(userId);
+            //filtering transactions by category
+            List<TransactionDTO> transactionByCategoryList = transactionService.getTxByCategory(transactionDTO, category);
+            return transactionByCategoryList;
+        }
+        else{
+            return null;
+        }
     }
+
 
     @Transactional
     @PutMapping(value= "/UpdateTransaction/{TransactionId}")

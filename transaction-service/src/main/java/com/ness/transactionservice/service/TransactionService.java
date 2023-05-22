@@ -18,7 +18,9 @@ public interface TransactionService {
 
     public void deleteTransaction(Integer TransactionId) throws TransactionNotFound;
     public Integer  getCardBalanceLeft(int userId);
-
+    public List<List<TransactionDTO>> getTransactionsByDayForUser(Integer userId);
+    public List<List<TransactionDTO>> getTransactionsByMonthForUser(Integer userId);
+    public List<List<TransactionDTO>> getTransactionsByYearForUser(Integer userId);
 
     public boolean doesUserExist(int userId);
 }
