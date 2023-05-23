@@ -12,4 +12,8 @@ public interface UserService {
     void updateUserDetails(Integer userId, UserDTO userDTO);
 
     void deleteUser(Integer userid);
+
+    public String generateToken(String userName);
+
+    public void validateToken(String token);
 }

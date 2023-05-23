@@ -7,6 +7,7 @@ import com.ness.userservice.model.User;
 import com.ness.userservice.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,6 +18,12 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
+
     @Override
     public Integer addUser(UserDTO userDTO) throws UserAlreadyExists {
         Optional<User> optional = userRepository.findById(userDTO.getUserId());
@@ -24,6 +31,9 @@ public class UserServiceImpl implements UserService{
             User user = optional.orElseThrow(() -> new UserAlreadyExists("Service.USER_ALREADY_EXISTS"));
             return user.getUserId();
         }
+
+        userDTO.setUserPassword(passwordEncoder.encode(userDTO.getUserPassword()));
+
         User user = new User();
         userRepository.save(mapToModel(user,userDTO));
         log.info("User with id: {} added.",user.getUserId());
@@ -67,6 +77,14 @@ public class UserServiceImpl implements UserService{
         userDTO.setUserPassword(user.getUserPassword());
         userDTO.setUserLimit(user.getUserLimit());
         return userDTO;
+    }
+
+    public String generateToken(String userName) {
+        return jwtService.generateToken(userName);
+    }
+
+    public void validateToken(String token) {
+        jwtService.validateToken(token);
     }
 
 

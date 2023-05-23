@@ -12,11 +12,15 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/user/**
+          filters:
+            - AuthenticateFilter
 
         - id: transaction-service
           uri: lb://transaction-service
           predicates:
             - Path=/transaction/**
+          filters:
+            - AuthenticateFilter
 
 eureka:
   instance:
